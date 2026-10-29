@@ -9,7 +9,7 @@ export interface Product{
     brand_id:number,
     brand:string,
     description?: string,
-    reorder_lavel?: number,
+    reorder_level?: number,
     active: boolean,
     created_at?: string,
     updated_at?:string;

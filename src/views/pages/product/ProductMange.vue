@@ -2,7 +2,7 @@
 import { api, baseUrl } from "@/api.ts";
 import PageHead from "@/components/PageHead.vue";
 import type { Product } from "@/interfaces/product";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 let products = ref<Product[]>([]);
 // console.log(products);
@@ -24,6 +24,23 @@ function getAllProducts( url : string) {
 }
 
 getAllProducts('products');
+
+function handleDelete(id:number){
+   api
+   .delete(`products/${id}`)
+   .then((res: any)=>{
+     getAllProducts('products')
+   })
+   .catch((err : any)=>{
+     console.log(err.response.data)
+   });
+}
+
+onMounted(()=>{
+  getAllProducts('products');
+});
+
+
 
 
 </script>
@@ -97,13 +114,13 @@ getAllProducts('products');
                       <i class="bi bi-eye"></i>
                     </RouterLink>
                     <RouterLink
-                      to="/products/edit"
+                      :to="`/products/edit/${item.id}`"
                       type="button"
                       class="btn-outline theme-secondary"
                     >
                       <i class="bi bi-pencil"></i>
                     </RouterLink>
-                    <button type="button" class="btn-outline theme-secondary">
+                    <button type="button" @click="handleDelete(item.id)" class="btn-outline theme-secondary">
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>

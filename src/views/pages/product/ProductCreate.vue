@@ -50,7 +50,7 @@ const handleSubmit = () => {
   data.append('brand_id', product.value.brand_id.toString());
   data.append('price', product.value.price.toString());
   data.append('quantity', product.value.quantity.toString());
-  if(product.value.reorder_lavel)data.append('reorder_level',product.value.reorder_lavel.toString());
+  if(product.value.reorder_level)data.append('reorder_level',product.value.reorder_level.toString());
   data.append('description', product.value.description ?  product.value.description : '');
   data.append('active', product.value.active.toString());
   if(product.value.image)data.append('image',product.value.image)
@@ -127,7 +127,7 @@ function handleImage(event: any){
             <div class="col-12 md:col-6 xl:col-3">
               <div class="form-field">
                 <label class="form-label">Reorder level</label>
-                <input type="number" class="form-control" v-model="product.reorder_lavel">
+                <input type="number" class="form-control" v-model="product.reorder_level">
               </div>
             </div>
 

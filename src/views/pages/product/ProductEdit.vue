@@ -1,104 +1,227 @@
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
 import PageHead from "../../../components/PageHead.vue";
+import { defaultProduct } from "@/interfaces/product.ts";
+import type { Brand } from "@/interfaces/Brand.ts";
+import type { Category } from "@/interfaces/Category.ts";
+import { api, baseUrl } from "@/api.ts";
+import { useRoute, useRouter } from "vue-router";
+
+const id = useRoute().params.id;
+const route = useRouter();
+let product = ref(defaultProduct);
+let brand = ref<Brand[]>([]);
+let category = ref<Category[]>([]);
+
+function getbrands() {
+  api
+    .get("brands")
+    .then((res: any) => {
+      console.log(res.data);
+      brand.value = res.data.brands;
+    })
+    .then((err: any) => {
+      console.log(err.response.data);
+    });
+}
+getbrands();
+
+function getCategory() {
+  api
+    .get("categories")
+    .then((res: any) => {
+      console.log(res.data);
+      category.value = res.data.categories;
+    })
+    .then((err: any) => {
+      console.log(err.response.data);
+    });
+}
+getCategory();
+
+function getItem() {
+  api
+    .get(`products/${id}`)
+    .then((res) => {
+      console.log(res.data);
+      product.value = res.data.product;
+    })
+    .catch((err) => {
+      console.log(err.response.data);
+    });
+}
+onMounted(() => {
+  getItem();
+});
+
+const handleSubmit = () => {
+  // alert();
+  console.log(product.value);
+  let data = new FormData();
+  data.append("name", product.value.name);
+  data.append("category_id", product.value.category_id.toString());
+  data.append("brand_id", product.value.brand_id.toString());
+  data.append("price", product.value.price.toString());
+  data.append("quantity", product.value.quantity.toString());
+  if (product.value.reorder_level)
+    data.append("reorder_level", product.value.reorder_level.toString());
+  data.append(
+    "description",
+    product.value.description ? product.value.description : "",
+  );
+  data.append("active", product.value.active.toString());
+  if (product.value.image instanceof File)
+    data.append("image", product.value.image);
+
+  api
+    .put(`/products/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res: any) => {
+      //  console.log(res.data)
+      route.push("/products");
+    })
+
+    .catch((err: any) => {
+      console.log(err.response.data);
+    });
+};
+
+function handleImage(event: any) {
+  product.value.image = event.target.files[0] || null;
+}
 </script>
 
 <template>
-  <PageHead title="Product" subtitle=" Product create">
-    <RouterLink class="btn-solid theme-accent" to="/products">
-      Back to Product
-    </RouterLink>
+  <PageHead title="Product-edit" subtitle="edit product">
+    <RouterLink class="btn-outline theme-accent" to="/products"
+      ><i class="bi bi-arrow-left"></i> Back</RouterLink
+    >
   </PageHead>
 
   <section class="section-gap">
     <div class="card">
       <div class="card-body">
-        <form action="orders.html" method="get" data-bs-validate="">
+        <form v-on:submit.prevent="handleSubmit">
           <div class="row g-3">
             <div class="col-12 md:col-6">
               <div class="form-field">
-                <label class="form-label" for="fName">Customer name</label>
+                <label class="form-label">Name</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="fName"
-                  name="name"
-                  minlength="3"
-                  placeholder="e.g. Rahim Uddin"
+                  v-model="product.name"
                 />
               </div>
             </div>
             <div class="col-12 md:col-6">
               <div class="form-field">
-                <label class="form-label" for="fEmail">Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="fEmail"
-                  name="email"
-                  placeholder="name@example.com"
-                />
+                <label class="form-label">Category</label>
+                <select class="form-control" v-model="product.category_id">
+                  <option selected disabled>Select category...</option>
+                  <option v-for="item in category" :value="item.id">
+                    {{ item.name }}
+                  </option>
+                </select>
               </div>
             </div>
-            <div class="col-12 md:col-6 xl:col-3">
+            <div class="col-12 md:col-6">
               <div class="form-field">
-                <label class="form-label" for="fProduct">Product</label>
-                <select class="form-control" id="fProduct" name="product">
-                  <option value="">Choose...</option>
-                  <option>Polo Shirt</option>
-                  <option>Denim Jeans</option>
-                  <option>Hoodie</option>
-                  <option>Panjabi</option>
+                <label class="form-label">Brand</label>
+                <select class="form-control" v-model="product.brand_id">
+                  <option selected disabled>Select brand...</option>
+                  <option v-for="item in brand" :value="item.id">
+                    {{ item.name }}
+                  </option>
                 </select>
               </div>
             </div>
             <div class="col-12 md:col-6 xl:col-3">
               <div class="form-field">
-                <label class="form-label" for="fAmount">Amount (৳)</label>
+                <label class="form-label">Price (৳)</label>
                 <input
                   type="number"
                   class="form-control"
-                  id="fAmount"
-                  name="amount"
-                  min="1"
-                  placeholder="1500"
+                  v-model="product.price"
                 />
               </div>
             </div>
             <div class="col-12 md:col-6 xl:col-3">
               <div class="form-field">
-                <label class="form-label" for="fStatus">Status</label>
-                <select class="form-control" id="fStatus" name="status">
-                  <option>Pending</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-12 md:col-6 xl:col-3">
-              <div class="form-field">
-                <label class="form-label" for="fDate">Date</label>
+                <label class="form-label">QTY</label>
                 <input
-                  type="date"
+                  type="number"
                   class="form-control"
-                  id="fDate"
-                  name="date"
+                  v-model="product.quantity"
                 />
               </div>
             </div>
+            <div class="col-12 md:col-6 xl:col-3">
+              <div class="form-field">
+                <label class="form-label">Reorder level</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="product.reorder_level"
+                />
+              </div>
+            </div>
+
             <div class="col-12">
               <div class="form-field">
-                <label class="form-label" for="fNote">Note (optional)</label>
+                <label class="form-label">Description (optional)</label>
                 <textarea
                   class="form-control"
-                  id="fNote"
-                  name="note"
-                  rows="2"
+                  v-model="product.description"
                 ></textarea>
               </div>
             </div>
+
+            <div class="col-12">
+              <div class="border rounded p-3 text-center">
+                <img
+                  v-if="product.image"
+                  :src="`${baseUrl}${product.image}`"
+                  :alt="product.name"
+                  class="img-fluid rounded"
+                  style="max-height: 80px; object-fit: contain"
+                />
+                <img
+                  v-else
+                  src="https://placehold.co/400x400"
+                  alt="Product image"
+                  class="img-fluid rounded"
+                  style="max-height: 280px; object-fit: contain"
+                />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Image (optional)</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  accept="image/*"
+                  @change="handleImage"
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-field">
+                <input
+                  type="checkbox"
+                  id="active"
+                  class="check"
+                  v-model="product.active"
+                  :checked="product.active"
+                />
+                <label for="active">Is active</label>
+              </div>
+            </div>
             <div class="col-12 form-actions">
-              <button type="submit" class="btn-solid theme-primary">
-                <i class="bi bi-plus-lg"></i> Add order
+              <button type="submit" class="btn-solid theme-accent">
+                <i class="bi bi-plus-lg"></i> update
               </button>
               <button type="reset" class="btn-outline theme-secondary">
                 Reset

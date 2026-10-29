@@ -83,7 +83,7 @@ onMounted(() => {
                                     </tr>
                                     <tr>
                                         <th scope="row">Reorder Level</th>
-                                        <td>{{ item.reorder_lavel }}</td>
+                                        <td>{{ item.reorder_level }}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Description</th>

@@ -11,7 +11,7 @@ const routes = [
     {path: '/users', component:UserManage},
     {path: '/products', component:ProductMange},
     {path: '/products/create', component:ProductCreate},
-    {path: '/products/edit', component:ProductEdit},
+    {path: '/products/edit/:id', component:ProductEdit},
     {path: '/products/:id', component:ProductDetails},
 ]
 
