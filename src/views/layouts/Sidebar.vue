@@ -21,6 +21,14 @@ import { useRoute } from 'vue-router';
       <RouterLink class="side-link" :class="{active: route.path.startsWith('/products')}" to="products"
         ><i class="bi bi-plus-circle"></i> products</RouterLink
       >
+
+      <RouterLink class="side-link" :class="{active: route.path.startsWith('/count')}" to="/count"
+        ><i class="bi bi-plus-circle"></i> Count</RouterLink
+      >
+
+      <RouterLink class="side-link" :class="{active: route.path.startsWith('/UpdateId')}" to="/UpdateId"
+        ><i class="bi bi-plus-circle"></i> UpdateId</RouterLink
+      >
     </nav>
   </aside>
 
